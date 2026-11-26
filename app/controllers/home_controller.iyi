@@ -1,0 +1,6 @@
+class HomeController < ApplicationController
+  # GET /
+  def index
+    render "home/index"
+  end
+end

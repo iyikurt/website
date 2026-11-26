@@ -1,0 +1,87 @@
+import std/html::{HTML}
+import std/regex::{Regex}
+
+# The docs: one page per topic of TOPICS (docs_content.iyi), drawn by one
+# template, docs/show.eiy, with the topics listed beside it by group.
+class DocsController < ApplicationController
+  @topic : Topic = TOPICS[0]
+
+  before_action :set_topic, only: [:show]
+
+  # GET /docs - the first topic
+  def index
+    render "docs/show"
+  end
+
+  # GET /docs/:slug
+  def show
+    render "docs/show"
+  end
+
+  # An unknown topic is a 404 before the action runs.
+  def set_topic
+    found = TOPICS.find { |topic| topic.slug == params[:slug] }
+    return NotFound.new("Topic") if found.nil?
+    @topic = found
+    nil
+  end
+
+  def doc_path(topic : Topic) : String
+    "/docs/" + topic.slug
+  end
+
+  def position : Int32
+    (TOPICS.index { |topic| topic.slug == @topic.slug } || 0) + 1
+  end
+
+  # "Docs · Models · 6 of 15"
+  def trail_count : String
+    position.to_s + " of " + TOPICS.size.to_s
+  end
+
+  def previous_topic : Topic?
+    at = position - 1
+    at > 0 ? TOPICS[at - 1] : nil
+  end
+
+  def next_topic : Topic?
+    at = position - 1
+    at + 1 < TOPICS.size ? TOPICS[at + 1] : nil
+  end
+
+  # The sidebar: each group's name and its topics, in order.
+  def doc_groups : Array({String, Array(Topic)})
+    groups = [] of {String, Array(Topic)}
+    TOPICS.each do |topic|
+      name = topic.section
+      if groups.empty? || groups.last[0] != name
+        groups << {name, [topic]}
+      else
+        groups.last[1] << topic
+      end
+    end
+    groups
+  end
+
+  # A listing as HTML: escaped, with comments and strings marked.
+  def listing(code : String) : String
+    code.chomp.lines.map { |line| highlight(line) }.join("\n")
+  end
+
+  private def highlight(line : String) : String
+    stripped = line.lstrip
+    if stripped.starts_with?("#") || stripped.starts_with?("-- ")
+      return "<span class=\"c\">" + HTML.escape(line) + "</span>"
+    end
+    code = line
+    comment = ""
+    if at = line.index("  # ")
+      code = line[0, at]
+      comment = line[at, line.size - at]
+    end
+    html = HTML.escape(code)
+      .gsub(/\b(class|def|end|do|if|else|unless|private|self|true|false|nil)\b/) { |match| "<span class=\"k\">" + match + "</span>" }
+      .gsub(/&quot;[^&]*&quot;/) { |match| "<span class=\"s\">" + match + "</span>" }
+    comment.empty? ? html : html + "<span class=\"c\">" + HTML.escape(comment) + "</span>"
+  end
+end

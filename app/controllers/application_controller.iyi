@@ -1,0 +1,16 @@
+# The parent of every controller: what the layout asks of any page.
+class ApplicationController < Controller
+  # The masthead's and the footer's pages: path and name.
+  def nav_items : Array({String, String})
+    [
+      {"/docs", "Docs"},
+    ]
+  end
+
+  # ` aria-current="page"` on the link to the page being shown, or to the
+  # section it is part of (/docs for /docs/models).
+  def current_attr(path : String) : String
+    here = env.request.path
+    here == path || here.starts_with?(path + "/") ? " aria-current=\"page\"" : ""
+  end
+end

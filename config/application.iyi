@@ -1,0 +1,12 @@
+# Runs once when the application starts, before its routes are mounted.
+
+# Sessions are an encrypted cookie. This secret was generated for
+# development and test by `kurt new`; production refuses to start without
+# its own SESSION_SECRET (32 bytes or more: `openssl rand -hex 32`).
+SECRET = session_secret("3ba875fb1a9c881878730b49f66225414265ee85b53327da27ed7df017201d2a")
+
+use SecurityHeadersHandler.new(strict_transport_security: production? ? "max-age=31536000" : nil), 0   # nosniff, frames; HSTS over HTTPS
+use RequestIdHandler.new        # X-Request-Id, in the log line too
+use OverrideMethodHandler.new   # _method=patch/delete from HTML forms
+use SessionHandler.new(SECRET, secure: production?)   # an HTTPS-only cookie in production
+use CSRFHandler.new             # forms carry <%= raw(csrf_field) %>

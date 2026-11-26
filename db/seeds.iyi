@@ -1,0 +1,8 @@
+# The rows a new database starts with: `kurt db:seed`, and `kurt db:reset`
+# after it migrates. Written with the models, as anywhere else; run it as
+# often as you like, find_or_create_by finds what an earlier run made.
+#
+#   ada = User.find_or_create_by(email: "ada@example.com") do |user|
+#     user.name = "Ada"
+#   end!
+#   Post.find_or_create_by(title: "Welcome", user_id: ada.id)!

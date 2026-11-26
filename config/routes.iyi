@@ -1,0 +1,5 @@
+# Every route of the site. `kurt routes` lists them all.
+
+root HomeController, :index
+get "/docs", DocsController, :index
+get "/docs/:slug", DocsController, :show

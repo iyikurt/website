@@ -1,0 +1,62 @@
+<% content_for "title" do %><%= @topic.slug %> · Kurt docs<% end -%>
+<div class="wrap docs">
+  <nav class="docs-side" aria-label="Docs">
+    <% doc_groups.each do |group| %>
+    <div>
+      <b><%= group[0] %></b>
+      <% group[1].each do |topic| %>
+      <a href="<%= doc_path(topic) %>"<%= raw(topic.slug == @topic.slug ? " aria-current=\"page\"" : "") %>><%= topic.slug %></a>
+      <% end %>
+    </div>
+    <% end %>
+  </nav>
+
+  <article class="doc">
+    <header class="doc-head">
+      <p class="trail"><a href="/docs">Docs</a> · <%= @topic.section %> · <%= trail_count %></p>
+      <h1 class="h1"><%= @topic.slug %></h1>
+      <p class="lead"><%= raw(@topic.lead) %></p>
+    </header>
+
+    <div class="block">
+      <div class="block-head">
+        <span class="block-name"><%= @topic.path %></span>
+        <button type="button" class="copy" data-copy="<%= @topic.code.chomp %>" aria-label="Copy the listing">Copy</button>
+      </div>
+<pre><%= raw(listing(@topic.code)) %></pre>
+    </div>
+
+    <% unless @topic.output.empty? %>
+    <p class="doc-label">What it printed</p>
+    <div class="block block--out">
+      <div class="block-head"><span class="block-name"><%= @topic.out_caption %></span></div>
+<pre><%= @topic.output.chomp %></pre>
+    </div>
+    <% end %>
+
+    <div class="prose">
+      <%= raw(@topic.body) %>
+    </div>
+
+    <section class="try">
+      <h2 class="h3">Try it on your machine</h2>
+      <p class="text"><%= raw(@topic.try_it) %></p>
+      <div class="block">
+        <div class="block-head">
+          <span class="block-name">sh</span>
+          <button type="button" class="copy" data-copy="<%= @topic.command %>" aria-label="Copy the commands">Copy</button>
+        </div>
+<pre><% @topic.command.lines.each_with_index do |line, i| %><%= i > 0 ? "\n" : "" %><span class="prompt">$ </span><%= line %><% end %></pre>
+      </div>
+    </section>
+
+    <nav class="pager" aria-label="Topics">
+      <% if before = previous_topic %>
+      <a href="<%= doc_path(before) %>"><small>Previous</small><span>← <%= before.slug %></span></a>
+      <% end %>
+      <% if after = next_topic %>
+      <a class="next" href="<%= doc_path(after) %>"><small>Next</small><span><%= after.slug %> →</span></a>
+      <% end %>
+    </nav>
+  </article>
+</div>

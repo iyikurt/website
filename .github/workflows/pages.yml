@@ -1,0 +1,77 @@
+# Builds the site with `kurt export` and publishes dist/ on GitHub Pages.
+# Pages has to deploy from GitHub Actions: Settings → Pages → Source.
+name: Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time: a run in progress finishes, and of the runs
+# waiting behind it only the latest goes on.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  IYI_VERSION: "0.22.0"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the site
+        uses: actions/checkout@v7
+        with:
+          path: site
+
+      # Kurt has no release yet: the site builds against its main branch.
+      - name: Check out Kurt
+        uses: actions/checkout@v7
+        with:
+          repository: iyikurt/kurt
+          path: kurt
+
+      - name: Install iyi
+        working-directory: ${{ runner.temp }}
+        run: |
+          base="https://github.com/iyilang/iyi/releases/download/v$IYI_VERSION"
+          curl -fsSLO "$base/iyi-$IYI_VERSION-linux-x86_64.tar.gz"
+          curl -fsSLO "$base/SHA256SUMS"
+          sha256sum -c --ignore-missing SHA256SUMS
+          mkdir -p "$HOME/.local"
+          tar -xzf "iyi-$IYI_VERSION-linux-x86_64.tar.gz" -C "$HOME/.local"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Install SQLite
+        run: sudo apt-get update && sudo apt-get install -y libsqlite3-dev
+
+      - name: Build kurt
+        run: make -C kurt
+
+      - name: Export the site
+        working-directory: site
+        run: |
+          echo "replace github.com/iyikurt/kurt => $GITHUB_WORKSPACE/kurt" >> iyi.mod
+          ../kurt/bin/kurt export
+
+      - name: Upload dist/
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

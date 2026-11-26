@@ -1,0 +1,155 @@
+<% content_for "title" do %>Kurt: an MVC web framework for iyi<% end -%>
+<div class="wrap">
+  <section class="hero">
+    <div class="hero-art">
+      <img class="logo-light" src="/brand/kurt.svg?v=3" alt="The Kurt logo: a howling wolf with iyi written in its mane" width="250" height="285">
+      <img class="logo-dark" src="/brand/kurt-dark.svg?v=3" alt="The Kurt logo: a howling wolf with iyi written in its mane" width="250" height="285">
+    </div>
+    <div class="hero-copy">
+      <h1 class="h1">Fast and readable, for people and their agents.</h1>
+      <p class="lead">Kurt is an MVC web framework for iyi. You and the coding agent working with you follow the same rules: every file has a fixed place, and <code>AGENTS.md</code> writes those rules down. That means:</p>
+      <ul class="points">
+          <li>you write less code</li>
+          <li>the agent reads the rules instead of guessing</li>
+          <li>requests are answered by compiled code</li>
+      </ul>
+      <div class="actions">
+        <a class="button" href="/docs">Read the docs</a>
+        <a class="button button--ghost" href="#story">See an app built step by step</a>
+      </div>
+      <a class="more" href="#fast">Why Kurt is fast →</a>
+    </div>
+  </section>
+
+  <section class="sec story" id="story" data-story>
+    <div class="sec-head">
+      <p class="eyebrow">Step by step</p>
+      <h2 class="h2">Build an application from scratch.</h2>
+      <p class="text">Thirteen steps from one real session. Each shows a command and its output, or a file it created. Scroll once to move one step.</p>
+    </div>
+    <div class="story-grid">
+      <ol class="story-steps">
+          <li class="story-step" data-step="0">
+            <div class="story-copy">
+              <span class="story-num">01</span>
+              <h3 class="h3">Create the application</h3>
+              <p class="text"><code>kurt new</code> creates sixteen files: settings, a home page with its layout, a stylesheet, folders for the database and the tests, and <code>AGENTS.md</code>. The app can serve a page right away.</p>
+            </div>
+          </li>
+          <li class="story-step" data-step="1">
+            <div class="story-copy">
+              <span class="story-num">02</span>
+              <h3 class="h3">The folder layout</h3>
+              <p class="text">Models, views and controllers live side by side in <code>app/</code>. <code>config/</code> holds the startup code and the routes, <code>db/</code> the migrations and seed data, <code>test/</code> the tests. Files in <code>app/</code> need no module header or imports; the build adds them.</p>
+            </div>
+          </li>
+          <li class="story-step" data-step="2">
+            <div class="story-copy">
+              <span class="story-num">03</span>
+              <h3 class="h3">Add a resource with a scaffold</h3>
+              <p class="text">This command adds a Post with three fields. It creates nine files and updates two: a model, a migration, a controller with seven actions, five views, the routes and a test.</p>
+            </div>
+          </li>
+          <li class="story-step" data-step="3">
+            <div class="story-copy">
+              <span class="story-num">04</span>
+              <h3 class="h3">Update the database</h3>
+              <p class="text"><code>kurt db:migrate</code> runs the migration and saves the table structure to <code>db/schema.json</code>. It also lists the columns at the top of the model file.</p>
+            </div>
+          </li>
+          <li class="story-step" data-step="4">
+            <div class="story-copy">
+              <span class="story-num">05</span>
+              <h3 class="h3">The model</h3>
+              <p class="text">You don't declare columns in the model; they come from the database. Here you only write behaviour: for now one validation, later associations, callbacks and queries.</p>
+            </div>
+          </li>
+          <li class="story-step" data-step="5">
+            <div class="story-copy">
+              <span class="story-num">06</span>
+              <h3 class="h3">The migration</h3>
+              <p class="text">Plain SQL with an up and a down section. If <code>DATABASE_URL</code> points to PostgreSQL, the generator writes PostgreSQL instead of SQLite.</p>
+            </div>
+          </li>
+          <li class="story-step" data-step="6">
+            <div class="story-copy">
+              <span class="story-num">07</span>
+              <h3 class="h3">The controller</h3>
+              <p class="text">Seven actions. The <code>set_post</code> filter loads the record before <code>show</code>, <code>edit</code>, <code>update</code> and <code>destroy</code>; if it doesn't exist, the page returns 404. <code>post_params</code> decides which form fields reach the model.</p>
+            </div>
+          </li>
+          <li class="story-step" data-step="7">
+            <div class="story-copy">
+              <span class="story-num">08</span>
+              <h3 class="h3">The views</h3>
+              <p class="text">An <code>.eiy</code> file is HTML with iyi code inside. It is compiled together with the app, so a typo becomes a build error instead of a crash in production. <code>&lt;%= %&gt;</code> escapes what it prints.</p>
+            </div>
+          </li>
+          <li class="story-step" data-step="8">
+            <div class="story-copy">
+              <span class="story-num">09</span>
+              <h3 class="h3">The routes</h3>
+              <p class="text">One <code>resources</code> line creates a route for every action the controller has. <code>kurt routes</code> lists them all; <code>/up</code> is the health check.</p>
+            </div>
+          </li>
+          <li class="story-step" data-step="9">
+            <div class="story-copy">
+              <span class="story-num">10</span>
+              <h3 class="h3">The test</h3>
+              <p class="text">The test calls the routes directly, without a browser or a network connection, on a fresh database. It checks the list, a rejected form, a created post, a 404 and a delete.</p>
+            </div>
+          </li>
+          <li class="story-step" data-step="10">
+            <div class="story-copy">
+              <span class="story-num">11</span>
+              <h3 class="h3">AGENTS.md for coding agents</h3>
+              <p class="text">Coding agents such as Codex, Cursor and Copilot read <code>AGENTS.md</code> on their own. It describes the folder layout, the commands and the rules for each part. <code>CLAUDE.md</code> is one line that points Claude Code to the same file.</p>
+            </div>
+          </li>
+          <li class="story-step" data-step="11">
+            <div class="story-copy">
+              <span class="story-num">12</span>
+              <h3 class="h3">Develop with kurt dev</h3>
+              <p class="text"><code>kurt dev</code> rebuilds the app when you save a file and refreshes the open page. If the change doesn't compile, you see the error on your line and the previous version keeps running.</p>
+            </div>
+          </li>
+          <li class="story-step" data-step="12">
+            <div class="story-copy">
+              <span class="story-num">13</span>
+              <h3 class="h3">Ship with kurt build</h3>
+              <p class="text"><code>kurt build</code> compiles the app, its views and its migrations into a single 5.1 MB file. The server doesn't need iyi or the source code.</p>
+            </div>
+          </li>
+      </ol>
+      <div class="story-stage">
+        <div class="term">
+          <div class="term-bar">
+            <span class="term-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="term-title">~/blog</span>
+            <span class="term-label" data-story-label></span>
+            <span class="story-count" data-story-count data-word="step"></span>
+          </div>
+          <div class="story-screen">
+<%= render "../home/_story_terminal.eiy" %>
+          </div>
+          <div class="story-progress" aria-hidden="true"><i data-story-bar></i></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="fast">
+    <div class="sec-head">
+      <p class="eyebrow">Performance</p>
+      <h2 class="h2">Why Kurt is fast</h2>
+      <p class="text">Interpreted frameworks redo part of their work on every request: loading code, finding methods, parsing templates. Kurt does this work once, when the app is built.</p>
+    </div>
+    <ul class="facts">
+        <li><strong>Native code</strong><span>iyi compiles to machine code through LLVM before the app runs, and checks the types at build time.</span></li>
+        <li><strong>Compiled templates</strong><span>Every <code>.eiy</code> view becomes code inside the binary, so rendering a page is just building a string.</span></li>
+        <li><strong>All CPU cores</strong><span>The server uses one thread per CPU core by default. Change it with <code>-w</code>.</span></li>
+        <li><strong>Fewer database queries</strong><span><code>includes</code> loads a list with its related records in two queries instead of one per row.</span></li>
+    </ul>
+    <p style="margin-top:28px"><a class="more" href="/docs">Read the docs →</a></p>
+  </section>
+</div>

@@ -1,0 +1,558 @@
+import std/list::{List}
+
+# The docs' topics, in the order the sidebar lists them. Each one shows one
+# file or command and what it printed. The files and the output are a real
+# application's: `kurt new blog --css none`, then `kurt g scaffold Post
+# title:string body:text published:bool` and `kurt db:migrate`.
+struct Topic
+  getter slug : String
+  getter section : String
+  getter lead : String
+  getter path : String
+  getter code : String
+  getter out_caption : String
+  getter output : String
+  getter body : String
+  getter command : String
+  getter try_it : String
+
+  def initialize(@slug : String, @section : String, @lead : String, @path : String,
+                 @code : String, @out_caption : String, @output : String,
+                 @body : String, @command : String, @try_it : String)
+  end
+end
+
+# install
+INSTALL_CODE = <<-'TXT'
+  git clone https://github.com/iyikurt/kurt.git ~/src/kurt
+  cd ~/src/kurt
+  make install                 # links bin/kurt into ~/.local/bin
+  export PATH="$HOME/.local/bin:$PATH"
+  TXT
+INSTALL_OUTPUT = <<-'TXT'
+  kurt 0.1.0
+  TXT
+INSTALL_BODY = <<-'TXT'
+  <ul><li><strong>iyi 0.21.0 or later.</strong> Tried with 0.22.0.</li><li><strong>A C compiler.</strong> <code>cc</code> links the program and the SQLite bindings.</li><li><strong>SQLite.</strong> macOS already has it. PostgreSQL is optional, through <code>DATABASE_URL</code>.</li></ul><p>Kurt is an iyi package, <code>github.com/iyikurt/kurt</code>, versioned by git tags. <code>kurt new</code> writes its own version into the application's <code>iyi.mod</code>, and iyi fetches the package on the first build. <code>KURT_PATH=~/src/kurt kurt new app</code> builds against your checkout instead.</p>
+  TXT
+
+# new
+NEW_CODE = <<-'TXT'
+  kurt new blog --css none
+  cd blog
+  kurt dev
+  TXT
+NEW_OUTPUT = <<-'TXT'
+      create  iyi.mod
+      create  config/application.iyi
+      create  config/routes.iyi
+      create  app/models/.keep
+      create  app/controllers/application_controller.iyi
+      create  app/controllers/home_controller.iyi
+      create  app/views/layouts/application.eiy
+      create  app/views/home/index.eiy
+      create  public/assets/app.css
+      create  public/icon.svg
+      create  db/migrations/.keep
+      create  test/fixtures/.keep
+      create  db/seeds.iyi
+      create  .gitignore
+      create  AGENTS.md
+      create  CLAUDE.md
+
+  Created blog. Next:
+    cd blog
+    kurt generate scaffold Post title:string body:text published:bool
+    kurt db:migrate
+    kurt dev
+  TXT
+NEW_BODY = <<-'TXT'
+  <p>Sixteen files: the configuration, a home page and its layout, a stylesheet, folders for the database and the tests, and the two files a coding agent reads first. <code>kurt dev</code> serves it at <code>localhost:3000</code>.</p><ul><li><strong>With Tailwind CSS and daisyUI by default.</strong> The standalone Tailwind CLI is fetched once into <code>~/.cache/kurt/</code> and checked against the release's checksums. No Node.</li><li><strong>Or with plain CSS.</strong> <code>--css none</code> leaves both out, as here.</li></ul>
+  TXT
+
+# scaffold
+SCAFFOLD_CODE = <<-'TXT'
+  kurt generate scaffold Post title:string body:text published:bool
+  kurt db:migrate
+  TXT
+SCAFFOLD_OUTPUT = <<-'TXT'
+      create  app/models/post.iyi
+      create  db/migrations/20261126212518_create_posts.sql
+      create  app/controllers/posts_controller.iyi
+      create  app/views/posts/index.eiy
+      create  app/views/posts/show.eiy
+      create  app/views/posts/new.eiy
+      create  app/views/posts/edit.eiy
+      create  app/views/posts/_form.eiy
+      update  config/routes.iyi
+      update  app/views/layouts/application.eiy
+      create  test/posts_test.iyi
+     migrate  20261126212518_create_posts
+        dump  db/schema.json
+      update  app/models/post.iyi
+  TXT
+SCAFFOLD_BODY = <<-'TXT'
+  <p>A field is <code>name:type</code>. The types are <code>string</code>, <code>text</code>, <code>int</code>, <code>float</code>, <code>bool</code>, <code>time</code> and <code>references</code>; <code>user:references</code> gives a <code>user_id</code> column and <code>belongs_to user</code>. <code>g</code> is short for <code>generate</code>.</p><table><thead><tr><th>Command</th><th>Writes</th></tr></thead><tbody><tr><td><code>kurt g scaffold</code></td><td>model, migration, controller, five views, routes, test</td></tr><tr><td><code>kurt g model</code></td><td>model and migration</td></tr><tr><td><code>kurt g controller</code></td><td>controller, views, routes</td></tr><tr><td><code>kurt g migration</code></td><td>an empty migration</td></tr><tr><td><code>kurt g authentication</code></td><td>users, sign-in, sign-up</td></tr></tbody></table>
+  TXT
+
+# layout
+LAYOUT_CODE = <<-'TXT'
+  blog/
+  ├── app/
+  │   ├── controllers/                    # C: one class per resource
+  │   │   ├── application_controller.iyi  # shared by every controller
+  │   │   └── home_controller.iyi
+  │   ├── models/                         # M: one class per table
+  │   └── views/                          # V: .eiy templates
+  │       ├── home/index.eiy
+  │       └── layouts/application.eiy     # the page around every view
+  ├── config/
+  │   ├── application.iyi                 # runs at start: middleware
+  │   └── routes.iyi                      # every route
+  ├── db/
+  │   ├── migrations/                     # plain SQL, -- up and -- down
+  │   └── seeds.iyi                       # a new database's first rows
+  ├── public/                             # served from disk as it is
+  │   ├── assets/app.css
+  │   └── icon.svg
+  ├── test/                               # *_test.iyi, through the routes
+  │   └── fixtures/                       # the rows a test starts from
+  ├── AGENTS.md                           # the rules, for coding agents
+  ├── CLAUDE.md                           # @AGENTS.md
+  └── iyi.mod                             # dependencies
+  TXT
+LAYOUT_OUTPUT = <<-'TXT'
+  app/controllers.iyi
+  app/fixtures.iyi
+  app/models.iyi
+  app/routes.iyi
+  blog.iyi
+  iyi.mod
+  posts_test.iyi
+  TXT
+LAYOUT_BODY = <<-'TXT'
+  <p>What you write has no module header and no imports. <code>kurt dev</code>, <code>kurt test</code> and <code>kurt build</code> turn it into iyi modules under <code>.kurt/build/</code>, which you never edit:</p><ul><li><strong>Every model goes into one module,</strong> with a <code>property</code> for each column. iyi forbids import cycles, and in one module a User and its Posts may still name each other.</li><li><strong>Every controller goes into another,</strong> <code>ApplicationController</code> first.</li><li><strong><code>config/routes.iyi</code> becomes the router's body.</strong> </li></ul><p>A build error still points at your file and line. A file that needs another module writes its own <code>import</code> at the top.</p>
+  TXT
+
+# agents
+AGENTS_CODE = <<-'TXT'
+  # blog
+
+  A Kurt application: an MVC web framework on iyi (https://iyi.dev), over
+  iyi-web (HTTP, routing, templates, sessions, CSRF) and db (SQL, pools).
+
+  ## Layout
+
+  No .iyi file here has a module header or imports. `kurt dev` and `kurt test`
+  compile them into modules under .kurt/build/ (generated: never edit it), adding the
+  imports each kind needs; errors still point at these files.
+
+  - `config/application.iyi`: runs at start. Middleware: method override, session cookie, CSRF.
+  - `config/routes.iyi`: `root HomeController, :index`, `resources "posts", PostsController`
+    (the REST routes for the actions the controller defines), `get "/about", PagesController, :about`.
+    A block nests resources (`/posts/:post_id/comments`); `namespace "admin" do ... end` prefixes paths.
+    `kurt routes` prints every route.
+  - `app/models/<model>.iyi`: `class Post < ApplicationRecord`, one per file.
+  - `app/controllers/<plural>_controller.iyi`: `class PostsController < ApplicationController`.
+  - `app/views/<plural>/<action>.eiy`: templates. `<%= expr %>` escapes; `raw(x)` does not.
+  - `db/migrations/<timestamp>_<name>.sql`: `-- up` and `-- down` sections of plain SQL.
+  - `test/<name>_test.iyi`: tests through the routes (`dispatch(RouteHandler.new(routes), ...)`).
+  - A file that needs another module adds its own `import` line at the top.
+  TXT
+AGENTS_OUTPUT = <<-'TXT'
+  @AGENTS.md
+  TXT
+AGENTS_BODY = <<-'TXT'
+  <p>Codex, Cursor, Copilot and Gemini CLI read <code>AGENTS.md</code> from a project's root on their own. <code>kurt new</code> writes it with what an agent would otherwise guess:</p><ul><li><strong>The layout.</strong> Which file holds what, and that no file has imports.</li><li><strong>The commands.</strong> Every <code>kurt</code> command and what it does.</li><li><strong>The rules of each part.</strong> How a model answers an error, what a controller may call, how a view escapes.</li></ul><p>Claude Code reads <code>CLAUDE.md</code> instead, so that file is one line, <code>@AGENTS.md</code>. One set of rules, in one place.</p>
+  TXT
+
+# models
+MODELS_CODE = <<-'TXT'
+  # Columns of posts (db/schema.json, kept up to date by `kurt db:migrate`):
+  #   id          Int64
+  #   title       String
+  #   body        String
+  #   published   Bool
+  #   created_at  Time
+  #   updated_at  Time
+  class Post < ApplicationRecord
+    validates :title, presence: true
+  end
+  TXT
+MODELS_OUTPUT = <<-'TXT'
+  {
+    "posts": [
+      {"name": "id", "sql": "INTEGER", "type": "Int64"},
+      {"name": "title", "sql": "TEXT", "type": "String"},
+      {"name": "body", "sql": "TEXT", "type": "String"},
+      {"name": "published", "sql": "BOOLEAN", "type": "Bool"},
+      {"name": "created_at", "sql": "DATETIME", "type": "Time"},
+      {"name": "updated_at", "sql": "DATETIME", "type": "Time"}
+    ]
+  }
+  TXT
+MODELS_BODY = <<-'TXT'
+  <p><code>kurt db:migrate</code> writes <code>db/schema.json</code>, and the build declares a typed <code>property</code> for each column, nilable when the column allows NULL. A <code>property</code> the model writes itself wins.</p><pre><code>class Post &lt; ApplicationRecord
+    belongs_to user : User
+    has_many comments : Comment, dependent: :destroy
+
+    validates :title, presence: true
+    validates :title, length: {maximum: 120}
+    before_validation :strip_title
+  end</code></pre><ul><li><strong>Associations.</strong> <code>belongs_to</code>, <code>has_many</code> and <code>has_one</code>, with <code>dependent:</code>.</li><li><strong>Validations.</strong> <code>presence</code>, <code>length</code>, <code>format</code>, <code>inclusion</code>, <code>uniqueness</code>, then the model's own <code>validate(errors)</code>.</li><li><strong>Callbacks.</strong> In order, from <code>before_validation</code> to <code>after_save</code>.</li></ul>
+  TXT
+
+# migrations
+MIGRATIONS_CODE = <<-'TXT'
+  -- up
+  CREATE TABLE posts (
+    id INTEGER PRIMARY KEY,
+    title TEXT NOT NULL DEFAULT '',
+    body TEXT NOT NULL DEFAULT '',
+    published BOOLEAN NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+
+  -- down
+  DROP TABLE posts;
+  TXT
+MIGRATIONS_OUTPUT = <<-'TXT'
+     migrate  20261126212518_create_posts
+        dump  db/schema.json
+      update  app/models/post.iyi
+
+    up    20261126212518_create_posts
+  TXT
+MIGRATIONS_BODY = <<-'TXT'
+  <p>The generators write SQLite, or PostgreSQL when <code>DATABASE_URL</code> is a <code>postgres://</code> URL.</p><table><thead><tr><th>Command</th><th>Does</th></tr></thead><tbody><tr><td><code>kurt db:migrate</code></td><td>runs what is pending, rewrites <code>db/schema.json</code></td></tr><tr><td><code>kurt db:rollback [N]</code></td><td>undoes the last N</td></tr><tr><td><code>kurt db:status</code></td><td>lists what has run</td></tr><tr><td><code>kurt db:reset</code></td><td>drops the SQLite database, migrates, seeds</td></tr><tr><td><code>kurt db:seed</code></td><td>runs <code>db/seeds.iyi</code></td></tr></tbody></table><p><code>db/seeds.iyi</code> writes a new database's first rows with the models, and runs again without doubles:</p><pre><code>ada = User.find_or_create_by(email: "ada@example.com") do |user|
+    user.name = "Ada"
+  end!</code></pre>
+  TXT
+
+# queries
+QUERIES_CODE = <<-'TXT'
+  posts = Post.where(published: true).order_desc(:id).paginate(params[:page]?, per: 20).all!
+  post  = Post.find(params[:id])!          # a 404 when missing
+  maybe = Post.find?(params[:id])          # nil when missing
+
+  # a list and its associations in two queries, not N+1
+  posts = Post.includes(:user, :comments).all!
+
+  # both rows, or neither
+  Post.transaction do |tx|
+    post = Post.create(attrs, on: tx)!
+    Comment.create(on: tx, post_id: post.id, body: "first")!
+    post
+  end
+  TXT
+QUERIES_BODY = <<-'TXT'
+  <p>iyi has no exceptions. A call answers <code>Post | NotFound | DBError</code>, and <code>!</code> passes the error to the one place that turns it into a response.</p><ul><li><strong>Typed finders.</strong> Each column has one: <code>Post.title("Hello").first?</code>.</li><li><strong>No N+1.</strong> After <code>includes</code>, <code>post.user</code> and <code>post.comments</code> ask the database nothing more.</li><li><strong>Transactions.</strong> A block that answers an error rolls everything back.</li></ul>
+  TXT
+
+# views
+VIEWS_CODE = <<-'TXT'
+  <% content_for "title" do %>Posts<% end -%>
+  <div class="page-header">
+    <h1>Posts</h1>
+    <%= link_to "New post", "/posts/new", class: "button" %>
+  </div>
+
+  <% if @posts.empty? %>
+  <p class="empty">No posts yet.</p>
+  <% else %>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Published</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    <% @posts.each do |post| %>
+      <tr>
+        <td><a href="<%= path_to(post) %>"><%= post.title %></a></td>
+        <td><%= post.published %></td>
+        <td class="row-actions">
+          <%= link_to "Edit", path_to(post) + "/edit" %>
+          <%= button_to "Delete", path_to(post), method: :delete, class: "link danger", confirm: "Delete this post?" %>
+        </td>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+  <% end %>
+  TXT
+VIEWS_BODY = <<-'TXT'
+  <p><code>render "posts/index"</code> draws this file inside <code>layouts/application.eiy</code>. A typo here is a build error, not a 500. The view reads the controller's instance variables as they are.</p><ul><li><strong>Escaping.</strong> <code>&lt;%= %&gt;</code> escapes; <code>raw(x)</code> does not.</li><li><strong>Partials.</strong> A name ending in <code>.eiy</code>: <code>render "_form.eiy", post: @post</code>, or once per item with <code>collection:</code>.</li><li><strong>Layouts.</strong> <code>layout: "admin"</code> picks another; <code>layout: false</code> draws none.</li></ul><table><thead><tr><th>Helper</th><th>Prints</th></tr></thead><tbody><tr><td><code>link_to "Edit", path</code></td><td>a link</td></tr><tr><td><code>button_to "Delete", path, method: :delete</code></td><td>a form with its CSRF field</td></tr><tr><td><code>pluralize(3, "comment")</code></td><td>3 comments</td></tr><tr><td><code>time_ago_in_words(t)</code></td><td>about 2 hours</td></tr><tr><td><code>simple_format(text)</code></td><td>paragraphs and line breaks</td></tr></tbody></table>
+  TXT
+
+# controllers
+CONTROLLERS_CODE = <<-'TXT'
+  class PostsController < ApplicationController
+    before_action :set_post, only: [:show, :edit, :update, :destroy]
+
+    # GET /posts
+    def index
+      @posts = Post.order_desc(:id).paginate(params[:page]?, per: 25).all!
+      render "posts/index"
+    end
+
+    # GET /posts/:id
+    def show
+      render "posts/show"
+    end
+
+    # GET /posts/new
+    def new
+      render "posts/new"
+    end
+
+    # POST /posts
+    def create
+      @post = Post.new(post_params)
+      if @post.save!
+        redirect_to path_to(@post), notice: "Post was created."
+      else
+        render "posts/new", status: 422
+      end
+    end
+
+    # GET /posts/:id/edit
+    def edit
+      render "posts/edit"
+    end
+
+    # PATCH /posts/:id
+    def update
+      if @post.update(post_params)!
+        redirect_to path_to(@post), notice: "Post was updated."
+      else
+        render "posts/edit", status: 422
+      end
+    end
+
+    # DELETE /posts/:id
+    def destroy
+      @post.destroy!
+      redirect_to "/posts", notice: "Post was deleted."
+    end
+
+    # The record the action works on; a missing one is a 404 before the
+    # action runs.
+    private def set_post
+      @post = Post.find(params[:id])!
+    end
+
+    # The fields the form may set: strong parameters.
+    private def post_params : Hash(String, String)
+      params.require(:post).permit(:title, :body, :published)
+    end
+  end
+  TXT
+CONTROLLERS_BODY = <<-'TXT'
+  <ul><li><strong>Each public method is an action.</strong> A route reaches it by name.</li><li><strong>Filters run first.</strong> <code>before_action</code>, with <code>only:</code> or <code>except:</code>. One that answers <code>Unauthorized</code>, <code>Forbidden</code>, <code>NotFound</code> or <code>DBError</code> stops the action.</li><li><strong>Params are text.</strong> <code>params[:id]</code> is <code>""</code> when missing, <code>params[:q]?</code> is nil. <code>permit</code> is the only way from a form to a model, and converts to the field types.</li><li><strong><code>@post</code> and <code>@posts</code> need no declaration.</strong> A variable named after a model holds that model, its plural an array of it, so neither is ever nil.</li></ul>
+  TXT
+
+# errors
+ERRORS_CODE = <<-'TXT'
+  class ApplicationController < Controller
+    before_action :require_login, except: [:index, :show]
+
+    # A filter that answers a Halt stops the action.
+    def require_login
+      Unauthorized.new unless session["user_id"]?
+    end
+  end
+  TXT
+ERRORS_BODY = <<-'TXT'
+  <table><thead><tr><th>Error</th><th>Response</th></tr></thead><tbody><tr><td><code>NotFound</code></td><td>404</td></tr><tr><td><code>Invalid</code></td><td>422, with the reasons</td></tr><tr><td><code>Unauthorized</code></td><td>a redirect to <code>/login</code>; 401 for JSON</td></tr><tr><td><code>Forbidden</code></td><td>403</td></tr><tr><td><code>DBError</code></td><td>503; the details only in the log</td></tr></tbody></table><p>An application's own page for any of them is registered before <code>install_error_pages</code>: <code>router.error NotFound do |env, err| ... end</code>.</p>
+  TXT
+
+# routes
+ROUTES_CODE = <<-'TXT'
+  # Every route of the application.
+  #
+  #   resources "posts", PostsController       the REST routes of a resource
+  #   get "/about", PagesController, :about    one route (post, put, patch, delete too)
+  #   resources "posts", PostsController do    nested: /posts/:post_id/comments
+  #     resources "comments", CommentsController
+  #   end
+  #   namespace "admin" do ... end             routes under /admin
+  #
+  # `kurt routes` lists them all.
+
+  root HomeController, :index
+  resources "posts", PostsController
+  TXT
+ROUTES_OUTPUT = <<-'TXT'
+    Verb    Path               Controller#Action
+    GET     /                  HomeController#index
+    GET     /posts             PostsController#index
+    GET     /posts/new         PostsController#new
+    POST    /posts             PostsController#create
+    GET     /posts/:id         PostsController#show
+    GET     /posts/:id/edit    PostsController#edit
+    PATCH   /posts/:id         PostsController#update
+    PUT     /posts/:id         PostsController#update
+    POST    /posts/:id         PostsController#update
+    DELETE  /posts/:id         PostsController#destroy
+    POST    /posts/:id/delete  PostsController#destroy
+    GET     /up                health check
+  TXT
+ROUTES_BODY = <<-'TXT'
+  <ul><li><strong><code>resources</code> gives the REST routes</strong> for exactly the actions the controller defines. <code>only:</code> and <code>except:</code> register fewer.</li><li><strong>A block nests resources.</strong> <code>/posts/:post_id/comments</code> reaches a controller that finds its parent with <code>params[:post_id]</code>.</li><li><strong><code>namespace "admin"</code> prefixes paths.</strong> </li><li><strong>HTML forms send PATCH and DELETE</strong> through <code>_method</code>; that is why the table also has <code>POST</code> rows.</li></ul>
+  TXT
+
+# tests
+TESTS_CODE = <<-'TXT'
+  # `kurt test` runs this against db/test.sqlite3, freshly migrated, through
+  # the routes and without a socket.
+  Post.delete_all.as(Int64)
+  app = RouteHandler.new(routes)
+
+  res = dispatch(app, "GET", "/posts").response
+  assert res.status_code == 200
+
+  # a blank title is refused, and the form comes back
+  res = dispatch(app, form_request("POST", "/posts", "post%5Btitle%5D=")).response
+  assert res.status_code == 422
+  assert Post.count.as(Int64) == 0
+
+  # a valid form creates one and redirects to it
+  res = dispatch(app, form_request("POST", "/posts", "post%5Btitle%5D=Example&post%5Bbody%5D=Example&post%5Bpublished%5D=1")).response
+  assert res.status_code == 303
+  post = Post.last?.as(Post)
+  assert res.headers["Location"]? == "/posts/" + post.id.to_s
+  assert dispatch(app, "GET", "/posts/" + post.id.to_s).response.status_code == 200
+
+  # a missing one is 404
+  assert dispatch(app, "GET", "/posts/999999").response.status_code == 404
+
+  # deleted through the form-friendly route
+  res = dispatch(app, form_request("POST", "/posts/" + post.id.to_s + "/delete", "")).response
+  assert res.status_code == 303
+  assert Post.count.as(Int64) == 0
+  TXT
+TESTS_OUTPUT = <<-'TXT'
+  1 passed, 0 failed
+  TXT
+TESTS_BODY = <<-'TXT'
+  <p><code>kurt test</code> migrates a fresh test database and runs every <code>test/*_test.iyi</code>, each starting from the rows in <code>test/fixtures/*.yml</code>. A label's id is the same on every run, so fixtures name each other:</p><pre><code># test/fixtures/posts.yml
+  welcome:
+    title: Welcome
+    user: ada          # the id of ada in users.yml</code></pre><p>A test reads a row as <code>posts(:welcome)</code>, and <code>sign_in_as(users(:ada))</code> signs the next requests in.</p>
+  TXT
+
+# dev
+DEV_CODE = <<-'TXT'
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= yield_content "title" %> · Blog</title>
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/assets/app.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">Blog</a>
+      <nav><a href="/posts">Posts</a><!-- kurt:nav --></nav>
+    </header>
+    <main class="container">
+      <% if notice = flash?("notice") %><p class="flash notice"><%= notice %></p><% end %>
+      <% if alert = flash?("alert") %><p class="flash alert"><%= alert %></p><% end %>
+      <%= content %>
+    </main>
+    <%= raw(live_reload_tag) %>
+  </body>
+  </html>
+  TXT
+DEV_OUTPUT = <<-'TXT'
+  [development] blog is ready to lead at http://localhost:3000
+  TXT
+DEV_BODY = <<-'TXT'
+  <ul><li><strong>It watches</strong> <code>app/</code>, <code>config/</code>, <code>db/schema.json</code> and <code>iyi.mod</code>.</li><li><strong>It builds beside the running server.</strong> When the build succeeds, the new server replaces the old one and the page reloads, through <code>live_reload_tag</code> at the bottom of the layout.</li><li><strong>A change that does not build</strong> shows the error at your line, and the last good server keeps answering.</li><li><strong><code>public/</code> is served from disk.</strong> It needs no restart.</li></ul>
+  TXT
+
+# build
+BUILD_CODE = <<-'TXT'
+  export KURT_ENV=production
+  export DATABASE_URL=postgres://app@db.local/blog
+  export SESSION_SECRET=$(openssl rand -hex 32)   # once, and kept
+  ./bin/blog db:migrate
+  ./bin/blog -b 0.0.0.0 -p 8080
+  TXT
+BUILD_OUTPUT = <<-'TXT'
+  5.1M    bin/blog
+  TXT
+BUILD_BODY = <<-'TXT'
+  <p><code>kurt build</code> compiles the application into <code>bin/NAME</code>, with the CSS minified. Copy it and <code>public/</code> to the server.</p><ul><li><strong>A real secret.</strong> Production refuses to start without a <code>SESSION_SECRET</code> of 32 bytes or more.</li><li><strong>Behind a proxy.</strong> The session cookie is <code>Secure</code>; nginx, Caddy or a load balancer ends TLS.</li><li><strong>A health check.</strong> <code>GET /up</code> answers 200 when the application and its database are up.</li><li><strong>A clean stop.</strong> On <code>TERM</code> the server takes no new connections and finishes the ones it has.</li></ul>
+  TXT
+
+# A List, not an Array: requests are served on many threads, and only a
+# shareable, unchanging value may be read by all of them.
+TOPICS = List.new([
+  Topic.new("install", "Start",
+    "Install Kurt from source, next to iyi.",
+    "sh", INSTALL_CODE, "kurt version", INSTALL_OUTPUT, INSTALL_BODY,
+    "kurt version", "It prints its version when it is on your PATH."),
+  Topic.new("new", "Start",
+    "Create a new application with one command.",
+    "sh", NEW_CODE, "kurt new blog --css none", NEW_OUTPUT, NEW_BODY,
+    "kurt new blog\ncd blog\nkurt dev", "Then open localhost:3000."),
+  Topic.new("scaffold", "Start",
+    "Generate a model, a migration, a controller, views, routes and a test with one command.",
+    "sh", SCAFFOLD_CODE, "kurt g scaffold · kurt db:migrate", SCAFFOLD_OUTPUT, SCAFFOLD_BODY,
+    "kurt g scaffold Post title:string body:text published:bool\nkurt db:migrate\nkurt dev", "Then open localhost:3000/posts and add one."),
+  Topic.new("layout", "Application",
+    "Where each file goes, and why you don't write imports.",
+    "blog/", LAYOUT_CODE, ".kurt/build/", LAYOUT_OUTPUT, LAYOUT_BODY,
+    "kurt build\nls .kurt/build", "Build once, then look at what the build wrote."),
+  Topic.new("agents", "Application",
+    "<code>AGENTS.md</code> tells coding agents how your application works.",
+    "AGENTS.md", AGENTS_CODE, "CLAUDE.md", AGENTS_OUTPUT, AGENTS_BODY,
+    "cat AGENTS.md", "Read what your agent reads."),
+  Topic.new("models", "Models",
+    "Models get their columns from the database; you only write the behaviour.",
+    "app/models/post.iyi", MODELS_CODE, "db/schema.json", MODELS_OUTPUT, MODELS_BODY,
+    "kurt g model Comment body:text post:references\nkurt db:migrate", "Add a model that belongs to Post."),
+  Topic.new("migrations", "Models",
+    "Change the database with plain SQL files.",
+    "db/migrations/20261126212518_create_posts.sql", MIGRATIONS_CODE, "kurt db:migrate · kurt db:status", MIGRATIONS_OUTPUT, MIGRATIONS_BODY,
+    "kurt g migration add_slug_to_posts\nkurt db:migrate\nkurt db:status", "Write a migration and run it."),
+  Topic.new("queries", "Models",
+    "Find, filter and save records, and pass errors on with <code>!</code>.",
+    "in an action", QUERIES_CODE, "", "", QUERIES_BODY,
+    "kurt dev", "Change a query in an action; the page reloads."),
+  Topic.new("views", "Views",
+    "Write pages as HTML with iyi code inside.",
+    "app/views/posts/index.eiy", VIEWS_CODE, "", "", VIEWS_BODY,
+    "kurt dev", "Edit a view while it runs; the page reloads itself."),
+  Topic.new("controllers", "Controllers",
+    "Controllers handle requests: they load data and render a view.",
+    "app/controllers/posts_controller.iyi", CONTROLLERS_CODE, "", "", CONTROLLERS_BODY,
+    "kurt g controller Pages about contact", "Generate two actions with their views and routes."),
+  Topic.new("errors", "Controllers",
+    "Return an error with <code>!</code>, and Kurt turns it into the right response.",
+    "app/controllers/application_controller.iyi", ERRORS_CODE, "", "", ERRORS_BODY,
+    "kurt g authentication\nkurt db:migrate", "Add sign-in; every page then asks for it."),
+  Topic.new("routes", "Routing",
+    "Connect URLs to controller actions in one file.",
+    "config/routes.iyi", ROUTES_CODE, "kurt routes", ROUTES_OUTPUT, ROUTES_BODY,
+    "kurt routes", "Print every route."),
+  Topic.new("tests", "Shipping",
+    "Test your app through its routes, on a fresh database.",
+    "test/posts_test.iyi", TESTS_CODE, "kurt test", TESTS_OUTPUT, TESTS_BODY,
+    "kurt test", "Run the scaffold's test."),
+  Topic.new("dev", "Shipping",
+    "Keep the app running while you work; it rebuilds when you save.",
+    "app/views/layouts/application.eiy", DEV_CODE, "kurt dev", DEV_OUTPUT, DEV_BODY,
+    "kurt dev -p 3000", "Keep it running while you edit."),
+  Topic.new("build", "Shipping",
+    "Build one file and run it on your server.",
+    "on the server", BUILD_CODE, "kurt build · du -h bin/blog", BUILD_OUTPUT, BUILD_BODY,
+    "kurt build\ndu -h bin/blog", "Build the release binary and see its size."),
+])

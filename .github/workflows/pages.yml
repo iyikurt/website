@@ -30,11 +30,13 @@ jobs:
         with:
           path: site
 
-      # Kurt has no release yet: the site builds against its main branch.
+      # The kurt command, built from the release iyi.mod requires. The
+      # site's build downloads that release itself, as any application's does.
       - name: Check out Kurt
         uses: actions/checkout@v7
         with:
           repository: iyikurt/kurt
+          ref: v0.1.0
           path: kurt
 
       - name: Install iyi
@@ -56,9 +58,7 @@ jobs:
 
       - name: Export the site
         working-directory: site
-        run: |
-          echo "replace github.com/iyikurt/kurt => $GITHUB_WORKSPACE/kurt" >> iyi.mod
-          ../kurt/bin/kurt export
+        run: ../kurt/bin/kurt export
 
       - name: Upload dist/
         uses: actions/upload-pages-artifact@v5

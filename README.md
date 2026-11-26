@@ -14,14 +14,8 @@ for [iyi](https://iyi.dev). The site is a Kurt application itself, and
 ## Running it
 
 You need [iyi](https://iyi.dev/install/) and `kurt`, built from a checkout of
-[Kurt](https://github.com/iyikurt/kurt) with `make install`. Kurt has no
-release yet, so point the site at that checkout with a line in `iyi.mod`, and
-leave the line out of commits:
-
-```
-replace github.com/iyikurt/kurt => /path/to/kurt
-```
-
+[Kurt](https://github.com/iyikurt/kurt) with `make install`. The site requires
+Kurt's v0.1.0 release in `iyi.mod`, and iyi downloads it on the first build.
 Then:
 
 ```sh
@@ -32,7 +26,7 @@ kurt export     # the static site, in dist/
 ## Publishing
 
 `.github/workflows/pages.yml` runs on every push to `main`. It installs iyi,
-builds `kurt` from Kurt's `main` branch, runs `kurt export` and publishes
+builds `kurt` from Kurt's v0.1.0 release, runs `kurt export` and publishes
 `dist/` on GitHub Pages. Pages has to deploy from GitHub Actions: Settings →
 Pages → Source.
 

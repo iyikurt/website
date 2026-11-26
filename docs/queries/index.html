@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>queries · Kurt docs</title>
+  <meta name="description" content="Kurt is an MVC web framework for iyi. Every file has one place, AGENTS.md writes the rules down, and kurt build ships the application as one native binary.">
+  <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/mona-sans-latin-wdth-normal.BMVx8nn_.woff2" crossorigin>
+  <link rel="preload" as="font" type="font/woff2" href="/assets/fonts/jetbrains-mono-latin-wght-normal.B9CIFXIH.woff2" crossorigin>
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#313338">
+  <script>
+    try {
+      if (localStorage.getItem("kurt-theme") === "light") document.documentElement.dataset.theme = "light";
+    } catch (e) {}
+  </script>
+  <link rel="stylesheet" href="/assets/site.css?v=19">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="masthead">
+    <div class="masthead-inner">
+      <a class="wordmark" href="/" aria-label="Kurt, home">
+        <img src="/brand/kurt-mark.svg" alt="" width="30" height="30">
+        <span>Kurt</span>
+      </a>
+      <nav id="site-nav" aria-label="Sections">
+        <ul>
+          
+          <li><a href="/docs" aria-current="page">Docs</a></li>
+          
+          <li><a href="https://iyi.dev/">iyi</a></li>
+          <li><a href="https://github.com/iyikurt/kurt">GitHub</a></li>
+        </ul>
+      </nav>
+      <div class="masthead-controls">
+        <button type="button" class="icon-button scheme-toggle" data-paper="#ffffff" data-paper-dark="#313338">
+          <svg class="to-dark" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M14 8.53A6 6 0 1 1 7.47 2a4.67 4.67 0 0 0 6.53 6.53z"></path></svg>
+          <svg class="to-light" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="3"></circle><path d="M8 1.1V3.4M8 12.6V14.9M1.1 8H3.4M12.6 8H14.9M3.12 3.12l1.63 1.63M11.25 11.25l1.63 1.63M3.12 12.88l1.63-1.63M11.25 4.75l1.63-1.63"></path></svg>
+          <span class="visually-hidden">Switch the colour scheme</span>
+        </button>
+        <button type="button" class="icon-button menu-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Menu">
+          <span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>
+        </button>
+      </div>
+    </div>
+  </header>
+  <main id="main">
+    <div class="wrap docs">
+  <nav class="docs-side" aria-label="Docs">
+    
+    <div>
+      <b>Start</b>
+      
+      <a href="/docs/install">install</a>
+      
+      <a href="/docs/new">new</a>
+      
+      <a href="/docs/scaffold">scaffold</a>
+      
+    </div>
+    
+    <div>
+      <b>Application</b>
+      
+      <a href="/docs/layout">layout</a>
+      
+      <a href="/docs/agents">agents</a>
+      
+    </div>
+    
+    <div>
+      <b>Models</b>
+      
+      <a href="/docs/models">models</a>
+      
+      <a href="/docs/migrations">migrations</a>
+      
+      <a href="/docs/queries" aria-current="page">queries</a>
+      
+    </div>
+    
+    <div>
+      <b>Views</b>
+      
+      <a href="/docs/views">views</a>
+      
+    </div>
+    
+    <div>
+      <b>Controllers</b>
+      
+      <a href="/docs/controllers">controllers</a>
+      
+      <a href="/docs/errors">errors</a>
+      
+    </div>
+    
+    <div>
+      <b>Routing</b>
+      
+      <a href="/docs/routes">routes</a>
+      
+    </div>
+    
+    <div>
+      <b>Shipping</b>
+      
+      <a href="/docs/tests">tests</a>
+      
+      <a href="/docs/dev">dev</a>
+      
+      <a href="/docs/build">build</a>
+      
+    </div>
+    
+  </nav>
+
+  <article class="doc">
+    <header class="doc-head">
+      <p class="trail"><a href="/docs">Docs</a> · Models · 8 of 15</p>
+      <h1 class="h1">queries</h1>
+      <p class="lead">Find, filter and save records, and pass errors on with <code>!</code>.</p>
+    </header>
+
+    <div class="block">
+      <div class="block-head">
+        <span class="block-name">in an action</span>
+        <button type="button" class="copy" data-copy="posts = Post.where(published: true).order_desc(:id).paginate(params[:page]?, per: 20).all!
+post  = Post.find(params[:id])!          # a 404 when missing
+maybe = Post.find?(params[:id])          # nil when missing
+
+# a list and its associations in two queries, not N+1
+posts = Post.includes(:user, :comments).all!
+
+# both rows, or neither
+Post.transaction do |tx|
+  post = Post.create(attrs, on: tx)!
+  Comment.create(on: tx, post_id: post.id, body: &quot;first&quot;)!
+  post
+end" aria-label="Copy the listing">Copy</button>
+      </div>
+<pre>posts = Post.where(published: <span class="k">true</span>).order_desc(:id).paginate(params[:page]?, per: 20).all!
+post  = Post.find(params[:id])!        <span class="c">  # a 404 when missing</span>
+maybe = Post.find?(params[:id])        <span class="c">  # nil when missing</span>
+
+<span class="c"># a list and its associations in two queries, not N+1</span>
+posts = Post.includes(:user, :comments).all!
+
+<span class="c"># both rows, or neither</span>
+Post.transaction <span class="k">do</span> |tx|
+  post = Post.create(attrs, on: tx)!
+  Comment.create(on: tx, post_id: post.id, body: <span class="s">&quot;first&quot;</span>)!
+  post
+<span class="k">end</span></pre>
+    </div>
+
+    
+
+    <div class="prose">
+      <p>iyi has no exceptions. A call answers <code>Post | NotFound | DBError</code>, and <code>!</code> passes the error to the one place that turns it into a response.</p><ul><li><strong>Typed finders.</strong> Each column has one: <code>Post.title("Hello").first?</code>.</li><li><strong>No N+1.</strong> After <code>includes</code>, <code>post.user</code> and <code>post.comments</code> ask the database nothing more.</li><li><strong>Transactions.</strong> A block that answers an error rolls everything back.</li></ul>
+    </div>
+
+    <section class="try">
+      <h2 class="h3">Try it on your machine</h2>
+      <p class="text">Change a query in an action; the page reloads.</p>
+      <div class="block">
+        <div class="block-head">
+          <span class="block-name">sh</span>
+          <button type="button" class="copy" data-copy="kurt dev" aria-label="Copy the commands">Copy</button>
+        </div>
+<pre><span class="prompt">$ </span>kurt dev</pre>
+      </div>
+    </section>
+
+    <nav class="pager" aria-label="Topics">
+      
+      <a href="/docs/migrations"><small>Previous</small><span>← migrations</span></a>
+      
+      
+      <a class="next" href="/docs/views"><small>Next</small><span>views →</span></a>
+      
+    </nav>
+  </article>
+</div>
+
+  </main>
+  <footer class="colophon">
+    <div class="colophon-inner">
+      <div class="colophon-top">
+        <div class="colophon-brand">
+          <a class="wordmark" href="/">
+            <img src="/brand/kurt-mark.svg" alt="" width="36" height="36">
+            <span>Kurt</span>
+          </a>
+          <p><strong>Kurt is Turkish for wolf.</strong> It is an MVC web framework for iyi: models read their columns from the database, views are compiled with the app, and <code>kurt build</code> ships everything as one file.</p>
+          <div><a class="button" href="/docs">Read the docs</a></div>
+        </div>
+        <nav class="colophon-links" aria-label="Footer">
+          <ul>
+            <li><a href="/">Home</a></li>
+            
+            <li><a href="/docs">Docs</a></li>
+            
+          </ul>
+          <ul>
+            <li><a href="https://github.com/iyikurt/kurt">Source on GitHub</a></li>
+            <li><a href="https://iyi.dev/">iyi</a></li>
+            <li><a href="https://github.com/sdogruyol/iyi-web">iyi-web</a></li>
+            <li><a href="https://github.com/iyilang/db">db</a></li>
+            <li><a href="https://forum.iyi.dev/">Forum</a></li>
+          </ul>
+        </nav>
+      </div>
+      <p class="colophon-bottom">
+        <span>Kurt 0.1.0 · needs iyi <a href="https://iyi.dev/install/">0.21.0</a> or later</span>
+        <span>This site is a Kurt application, in site/.</span>
+      </p>
+    </div>
+  </footer>
+  <p id="copy-status" class="visually-hidden" role="status" aria-live="polite"></p>
+  <script src="/assets/site.js?v=19" defer></script>
+  
+</body>
+</html>

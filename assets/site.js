@@ -103,11 +103,14 @@
           typed.textContent = "";
           typed.after(caret);
           const step = Math.max(8, Math.min(32, 700 / Math.max(text.length, 1)));
+          // Typed as plain text, then given back its colours.
+          const lit = () => { if (typed.dataset.html) typed.innerHTML = typed.dataset.html; else typed.textContent = text; };
           for (let i = 1; i <= text.length; i++) {
-            if (token !== run) { typed.textContent = text; caret.remove(); return; }
+            if (token !== run) { lit(); caret.remove(); return; }
             typed.textContent = text.slice(0, i);
             await wait(step);
           }
+          lit();
           await wait(160);
           caret.remove();
         } else if (!still.matches) {
